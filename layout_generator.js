@@ -1,6 +1,10 @@
-// Author: Michael Wehar
-// Additional credits: Itay Livni, Michael Blättler
-// MIT License
+/* Original Project sourced from https://github.com/MichaelWehar/Crossword-Layout-Generator
+ * Additional Features authored by:
+ *  Jayson Batie, Sharvari Tatachar, Marcus Wright
+ * MIT License
+ */
+
+var thesaurus = require('powerthesaurus-api')
 
 // Math functions
 function distance(x1, y1, x2, y2){
