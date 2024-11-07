@@ -64,14 +64,6 @@
         return tableArray.join("");
       }
 
-      const crosswordInput = [
-          "----w--",
-          "----o--",
-          "--words",
-          "----d--",
-          "words--"
-      ];
-
       function button_clicked(){
         // Input data
         var word_list = document.getElementById("words").value.replace(/[ \r\n,;:-]+/g, ",").split(",");
@@ -81,7 +73,9 @@
           // Output data
           var layout = generateLayout(input_json);
           // Generate the crossword HTML and log it
-          const crosswordHTML = generateCrosswordHTML(crosswordInput);
+          const crosswordHTML = generateCrosswordHTML(layout.table);
+          var crosswordHtml = crosswordHTML[0]
+          var answerkeyHtml = crosswordHTML[1]
           var rows = layout.rows;
           var cols = layout.cols;
           var table = layout.table; // table as two-dimensional array
@@ -94,7 +88,7 @@
           var word_search = create_word_search(alphabet, output_html);
 
           // Display result
-          document.getElementById("content").innerHTML = "<h3>Output JSON</h3><br>" + JSON.stringify(output_json) + "<br><br><h3>Output Html</h3><br>" + output_html + "<br><h3>Extra Output: Word Search</h3><br>" + word_search + "<br>" + crosswordHTML;
+          document.getElementById("content").innerHTML = "<h3>Output JSON</h3><br>" + JSON.stringify(output_json) + "<br><br><h3>Output Html</h3><br>" + output_html + "<br><h3>Extra Output: Word Search</h3><br>" + word_search + "<br>" + crosswordHtml + "<br>" + answerkeyHtml;
         }
       }
 
@@ -587,7 +581,7 @@
                   gap: 4px;
                   margin-bottom: 20px;
                   padding: 20px;
-                  border: 2px solid
+                  border: 2px solid;
                   width: fit-content
               }
               .cell {
@@ -601,24 +595,43 @@
                   background-color: #ffffff;
               }
               .empty-cell {
-                  background-color: white;
+                  background-color: black;
+                  width: 30px;
+                  height: 30px;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  font-size: 20px;
+                  border: 1px solid #333;
               }
           </style>
 
           <div class="crossword-container">
           `;
 
+          answerKey = html
           // Create the grid based on input
           input.forEach(row => {
-              row.split('').forEach(char => {
+              row.forEach(char => {
                   const cellClass = char === '-' ? 'empty-cell' : 'cell';
-                  html += `<div class="${cellClass}">${char === '-' ? '' : char}</div>`;
+                  answerKey += `<div class="${cellClass}">${char === '-' ? '' : char}</div>`;
               });
           });
 
-          html += '</div>';
+          answerKey += '</div>';
 
-          return html;
+          crossword = html
+          // Create the grid based on input
+          input.forEach(row => {
+              row.forEach(char => {
+                  const cellClass = char === '-' ? 'empty-cell' : 'cell';
+                  crossword += `<div class="${cellClass}">${char === '-' ? '' : ''}</div>`;
+              });
+          });
+
+          crossword += '</div>';
+
+          return [crossword, answerKey];
       }
     </script>
 
