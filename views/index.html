@@ -23,6 +23,7 @@
       <h2>Enter a list of words below</h2><br><br>
 
       <textarea id="words" rows="9" cols="35" autofocus="autofocus" style="font-size: 16px;" placeholder="Enter words on separate lines..."></textarea><br><br><br><br>
+      <textarea id="clues" rows="9" cols="35" autofocus="autofocus" style="font-size: 16px;" placeholder="Enter clues on separate lines..."></textarea><br><br><br><br>
       <button onclick="button_clicked();" style="font-size: 14px; cursor: pointer;">Generate Layout</button><br><br><br>
 
       <div id="content" style="font-family: 'Courier New', Courier, monospace"></div><br>
@@ -67,6 +68,7 @@
       function button_clicked(){
         // Input data
         var word_list = document.getElementById("words").value.replace(/[ \r\n,;:-]+/g, ",").split(",");
+        var clue_list = document.getElementById("clues").value.replace(/[\r\n]+/g, ",").split(",");
         if(word_list[0] != ""){
           var input_json = convert_to_json(word_list);
 
@@ -90,6 +92,7 @@
           // Display result
           document.getElementById("content").innerHTML = "<h3>Output JSON</h3><br>" + JSON.stringify(output_json) + "<br><br><h3>Output Html</h3><br>" + output_html + "<br><h3>Extra Output: Word Search</h3><br>" + word_search + "<br>" + crosswordHtml + "<br>" + answerkeyHtml;
         }
+        
       }
 
       // Math functions
