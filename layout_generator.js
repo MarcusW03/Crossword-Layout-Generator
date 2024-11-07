@@ -476,13 +476,13 @@ function generateSimpleTable(words){
   return finalTable;
 }
 
-function generateLayout(words_json){
+export function generateLayout(words_json){
   var layout = generateSimpleTable(words_json);
   layout.table_string = tableToString(layout.table, "<br>");
   return layout;
 }
 
 // The following was added to support Node.js
-if(typeof module !== 'undefined'){
-  module.exports = { generateLayout };
-}
+// if(typeof module !== 'undefined'){
+//   module.exports = { generateLayout };
+// }
