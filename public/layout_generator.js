@@ -80,7 +80,7 @@ function addWord(best, words, table){
     }
     words[index].orientation = "down";
   }
-  console.log(word + ", " + bestScore);
+  //console.log(word + ", " + bestScore);
 }
 
 function assignPositions(words){
@@ -485,6 +485,23 @@ function generateLayout(words_json){
 
 // Function to generate HTML for the crossword grid
 function generateCrosswordHTML(input, output_json) {
+  /*
+   * This function takes in a crossword as a list of rows. Dashes '-'
+   *  should be used for empty spaces, and letters used as letters.
+   *    ideally used with output of generateLayout().table
+   *  Example input : 
+   *        [ '--w-',
+   *          '--o-',
+   *          'word',
+   *          '--d-' ]
+   *  Also, accepts crossword out in json form. 
+   *    Ideally used with output of generateLayout().result
+   * Returns empty crossword and answer key as html strings in a list
+   *  of form [crossword, answers]
+   * 
+   * TODO: fix cell numbers, seems to not work for some examples
+   */
+  
   const rows = input.length;
   const cols = input[0].length;
 
@@ -538,7 +555,7 @@ function generateCrosswordHTML(input, output_json) {
 
   let start_positions = []
 
-  console.log(output_json)
+  //console.log(output_json)
 
   for (let i = 0; i < output_json.length; i++) {
     let starts = []
@@ -549,7 +566,7 @@ function generateCrosswordHTML(input, output_json) {
     start_positions.push(starts)
   }
 
-  console.log(start_positions)
+  //console.log(start_positions)
 
   let answerKey = html
   // Create the grid based on input
@@ -623,8 +640,14 @@ function generateCrosswordHTML(input, output_json) {
   return [crossword, answerKey];
 }
 
-function createPDF(crossword, answers) {
-  
+function createPDF(crossword, answers="") {
+  /*
+  This function takes in a crossword as HTML and then returns
+    it as a PDF. Takes in as one html item, or optionally as 
+    a separate crossword and answer key html
+
+  TODO: look into resizing html to better fit pdf
+   */
   const options = {
     margin:       1,
     filename:     'crossword.pdf',

@@ -82,20 +82,23 @@
           
           var crosswordHtml = crosswordHTML[0]
           var answerkeyHtml = crosswordHTML[1]
+          //update clue html here
+          clue_html = ""
+          answerkeyHtml += clue_html
           var doc = window.createPDF(crosswordHtml, answerkeyHtml)
           var rows = layout.rows;
           var cols = layout.cols;
           var table = layout.table; // table as two-dimensional array
           var output_html = layout.table_string; // table as plain text (with HTML line breaks)
           var output_json = layout.result; // words along with orientation, position, startx, and starty
-          console.log(output_json)
+          //console.log(output_json)
 
           // Word search data
           var alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
           var word_search = create_word_search(alphabet, output_html);
 
           // Display result
-          document.getElementById("content").innerHTML = "<h3>Output JSON</h3><br>" + JSON.stringify(output_json) + "<br><br><h3>Output Html</h3><br>" + output_html + "<br><h3>Extra Output: Word Search</h3><br>" + word_search + "<br>" + crosswordHtml + "<br>" + answerkeyHtml;
+          document.getElementById("content").innerHTML = "<h3>Output JSON</h3><br>" + JSON.stringify(output_json) + "<br><br><h3>Output Html</h3><br>" + output_html + "<br><h3>Extra Output: Word Search</h3><br>" + word_search + "<br>" + crosswordHtml + "<br>" + answerkeyHtml; //add clue html here;
           openpdf(doc)
         }
         
