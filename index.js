@@ -2,12 +2,15 @@
 var express = require('express');
 var app = express();
 
+//const { jsPDF } = require("jspdf"); // will automatically load the node version
+
 // set up BodyParser
-var bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded({ extended: true }));
+// var bodyParser = require('body-parser');
+// app.use(bodyParser.urlencoded({ extended: true }));
 
 // set up EJS
-app.set('view engine', 'ejs');
+//app.set('view engine', 'ejs');
+app.use(express.static('public'))
 
 // input_json = [{"clue":"that which is established as a rule or model by authority, custom, or general consent","answer":"standard"},{"clue":"a machine that computes","answer":"computer"},{"clue":"the collective designation of items for a particular purpose","answer":"equipment"},{"clue":"an opening or entrance to an inclosed place","answer":"port"},{"clue":"a point where two things can connect and interact","answer":"interface"}]
 // var clg = require("crossword-layout-generator");
@@ -21,10 +24,14 @@ app.set('view engine', 'ejs');
 app.use('/', (req, res) => {
 
     //console.log(output_json)
-    res.sendFile(__dirname + '/views/index.html')
+    res.sendFile(__dirname + '/public/index.html')
     //res.render("index")
 
-});
+}); 
+
+// app.use("layout_generator.js", (req, res) => {
+//     res.send('layout_generator.js')
+// })
 
 
 /*************************************************
