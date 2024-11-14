@@ -85,20 +85,24 @@ function addWord(best, words, table){
 
 function assignPositions(words){
   var positions = {};
+  var clueNumbers = {}; 
   for(let index in words){
     var word = words[index];
     if(word.orientation != "none"){
       var tempStr = word.starty + "," + word.startx;
       if(tempStr in positions){
         word.position = positions[tempStr];
+        clueNumbers[index] = word.position; 
       }
       else{
         // Object.keys is supported in ES5-compatible environments
         positions[tempStr] = Object.keys(positions).length + 1;
         word.position = positions[tempStr];
+        clueNumbers[index] = word.position; 
       }
     }
   }
+  // console.log('clueNumbers: ', clueNumbers); 
 }
 
 function computeDimension(words, factor){
@@ -635,7 +639,7 @@ function generateCrosswordHTML(input, output_json) {
           if (isNumbered) {
             //Create number box with start_position[2], and put in html
             let position = start_positions[i][2]
-            // console.log("Is Numbered: " + position)
+            //console.log("Is Numbered: " + position)
             answerKey += `<div class="cell_number">${position}</div>`
           }
           answerKey += `</div>`;
@@ -676,4 +680,13 @@ function createPDF(crossword, answers="") {
 //The following was added to support Node.js
 if(typeof module !== 'undefined'){
   module.exports = { generateLayout, generateCrosswordHTML, createPDF };
+}
+
+function formatClues(input){
+  /*
+  This function takes in the user's input and a dictionary 
+  (clueNumbers) mapping the corresponding words to a position on
+  the puzzle board 
+  */
+  console.log('user input: ', input); 
 }
