@@ -27,7 +27,9 @@ One can visualize the output as follows:
 
 Alternate output format: 
 
-Generate your crossword layout in PDF format for easy use and distribution. 
+Generate your crossword layout in PDF format for easy use and distribution. Shown below: 
+
+![Image 11-14-24 at 11 41 AM](https://github.com/user-attachments/assets/0988c248-c502-466e-8af4-ab2cf9d673dd)
 
 ## Getting Started
 
