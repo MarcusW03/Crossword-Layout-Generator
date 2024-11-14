@@ -46,11 +46,11 @@
 
     <script>
       
-      function convert_to_json(word_list){
+      function convert_to_json(word_list, clue_list){
         var json_data = [];
         for(let i in word_list){
             if(word_list[i].length > 0){
-                json_data[i] = {"answer": word_list[i].toLowerCase()};
+                json_data[i] = {"answer": word_list[i].toLowerCase(), "clue": clue_list[i].toLowerCase()};
             }
         }
 
@@ -73,28 +73,25 @@
         var word_list = document.getElementById("words").value.replace(/[ \r\n,;:-]+/g, ",").split(",");
         var clue_list = document.getElementById("clues").value.replace(/[\r\n]+/g, ",").split(",");
         if(word_list[0] != ""){
-          var input_json = convert_to_json(word_list);
+          var input_json = convert_to_json(word_list, clue_list);
 
           // Output data
           var layout = window.generateLayout(input_json);
-          // Generate the crossword HTML and log it
+          
+         
           const crosswordHTML = window.generateCrosswordHTML(layout.table, layout.result);
-          window.formatClues(clue_list); 
           var crosswordHtml = crosswordHTML[0]
           var answerkeyHtml = crosswordHTML[1]
+          var cluesHtml = crosswordHTML[2]
       
           //update clue html here
-          clue_html = ""
-          crosswordHtml += clue_html
-          var doc = window.createPDF(crosswordHtml, answerkeyHtml)
-          
-
+          var doc = window.createPDF(crosswordHtml, answerkeyHtml) // TODO:  add cluesHtml here 
           var rows = layout.rows;
           var cols = layout.cols;
           var table = layout.table; // table as two-dimensional array
           var output_html = layout.table_string; // table as plain text (with HTML line breaks)
           var output_json = layout.result; // words along with orientation, position, startx, and starty
-          //console.log(output_json)
+          //console.log(output_json[0].position);
 
           // Word search data
           window.crosswordPDF = doc
@@ -107,7 +104,7 @@
           //   <button onclick="openpdf()">Open Crossword</button>`;
 
           // Display result
-          document.getElementById("content").innerHTML = "<h3>Output JSON</h3><br>" + JSON.stringify(output_json) + "<br><br><h3>Output Html</h3><br>" + output_html + "<br><h3>Extra Output: Word Search</h3><br>" + word_search + "<br><br>" + downloadButton +  "<br>" + crosswordHtml + "<br>" + answerkeyHtml; //add clue html here;
+          document.getElementById("content").innerHTML = "<h3>Output JSON</h3><br>" + JSON.stringify(output_json) + "<br><br><h3>Output Html</h3><br>" + output_html + "<br><h3>Extra Output: Word Search</h3><br>" + word_search + "<br>" + crosswordHtml +  "<br>"+ cluesHtml + "<br>" + answerkeyHtml; 
           openpdf(doc)
         }
         
