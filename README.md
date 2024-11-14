@@ -25,6 +25,12 @@ One can visualize the output as follows:
 
 ![Example Output](https://github.com/MichaelWehar/Crossword-Layout-Generator/blob/master/example_images/crossword1_filled.png)
 
+Alternate output format: 
+
+Generate your crossword layout in PDF format for easy use and distribution.
+
+![Image 11-14-24 at 11 41 AM](https://github.com/user-attachments/assets/0988c248-c502-466e-8af4-ab2cf9d673dd)
+
 ## Getting Started
 
 **Step 1:** Add the following line to the head of your html document:

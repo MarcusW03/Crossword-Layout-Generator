@@ -25,7 +25,7 @@
       <h2>Enter a list of words below</h2><br><br>
 
       <textarea id="words" rows="9" cols="35" autofocus="autofocus" style="font-size: 16px;" placeholder="Enter words on separate lines..."></textarea><br><br><br><br>
-      <textarea id="clues" rows="9" cols="35" autofocus="autofocus" style="font-size: 16px;" placeholder="Enter clues on separate lines..."></textarea><br><br><br><br>
+      <textarea id="clues" rows="9" cols="35" autofocus="autofocus" style="font-size: 16px;" placeholder="Enter corresponding clues on separate lines..."></textarea><br><br><br><br>
       <button onclick="button_clicked();" style="font-size: 14px; cursor: pointer;">Generate Layout</button><br><br><br>
 
       <div id="content" style="font-family: 'Courier New', Courier, monospace"></div><br>
@@ -79,13 +79,16 @@
           var layout = window.generateLayout(input_json);
           // Generate the crossword HTML and log it
           const crosswordHTML = window.generateCrosswordHTML(layout.table, layout.result);
-          
+          window.formatClues(clue_list); 
           var crosswordHtml = crosswordHTML[0]
           var answerkeyHtml = crosswordHTML[1]
+      
           //update clue html here
           clue_html = ""
-          answerkeyHtml += clue_html
-          var doc = createPDF(crosswordHtml, answerkeyHtml)
+          crosswordHtml += clue_html
+          var doc = window.createPDF(crosswordHtml, answerkeyHtml)
+          
+
           var rows = layout.rows;
           var cols = layout.cols;
           var table = layout.table; // table as two-dimensional array

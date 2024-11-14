@@ -85,20 +85,24 @@ function addWord(best, words, table){
 
 function assignPositions(words){
   var positions = {};
+  var clueNumbers = {}; 
   for(let index in words){
     var word = words[index];
     if(word.orientation != "none"){
       var tempStr = word.starty + "," + word.startx;
       if(tempStr in positions){
         word.position = positions[tempStr];
+        clueNumbers[index] = word.position; 
       }
       else{
         // Object.keys is supported in ES5-compatible environments
         positions[tempStr] = Object.keys(positions).length + 1;
         word.position = positions[tempStr];
+        clueNumbers[index] = word.position; 
       }
     }
   }
+  // console.log('clueNumbers: ', clueNumbers); 
 }
 
 function computeDimension(words, factor){
@@ -527,7 +531,7 @@ function generateCrosswordHTML(input, output_json) {
           display: flex;
           justify-content: center;
           align-items: center;
-          font-size: 10cqw;
+          font-size: calc(16px + (26 - 16) * ((100vw - 300px) / (1600 - 300)));
           border: 1px solid #333;
           background-color: #ffffff;
           position: relative;
@@ -535,7 +539,7 @@ function generateCrosswordHTML(input, output_json) {
       .cell_number {
           width: fit-content;
           height: fit-contet;
-          font-size: 4cqw;
+          font-size: 12px;
           background-color: #ffffff;
           display: flex;
           justify-content: center;
@@ -634,7 +638,6 @@ function generateCrosswordHTML(input, output_json) {
           if (isNumbered) {
             //Create number box with start_position[2], and put in html
             let position = start_positions[i][2]
-
             answerKey += `<div class="cell_number">${position}</div>`
           }
           answerKey += `</div>`;
@@ -651,8 +654,6 @@ function createPDF(crossword, answers="") {
   This function takes in a crossword as HTML and then returns
     it as a PDF. Takes in as one html item, or optionally as 
     a separate crossword and answer key html
-
-  TODO: look into resizing html to better fit pdf
    */
   const options = {
     margin:       1,
@@ -673,4 +674,13 @@ function createPDF(crossword, answers="") {
 //The following was added to support Node.js
 if(typeof module !== 'undefined'){
   module.exports = { generateLayout, generateCrosswordHTML, createPDF };
+}
+
+function formatClues(input){
+  /*
+  This function takes in the user's input and a dictionary 
+  (clueNumbers) mapping the corresponding words to a position on
+  the puzzle board 
+  */
+  console.log('user input: ', input); 
 }
