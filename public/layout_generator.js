@@ -570,6 +570,9 @@ function generateCrosswordHTML(input, output_json) {
 
   //console.log(output_json)
 
+  let clues_across = []
+  let clues_down = []
+
   for (let i = 0; i < output_json.length; i++) {
     let starts = []
     let item = output_json[i]
@@ -577,7 +580,25 @@ function generateCrosswordHTML(input, output_json) {
     starts.push(item.starty)
     starts.push(item.position)
     start_positions.push(starts)
+    if (item.orientation == "across") {
+      let clues = [item.position, item.clue]
+      clues_across.push(clues)
+    }
+    else if (item.orientation == "down") {
+      let clues = [item.position, item.clue]
+      clues_down.push(clues)
+    }
   }
+
+  let clue_html = `<h1>Clues</h1><br><h2>Across</h2><br><ul>`
+  for (let i = 0; i < clues_across.length; i++) {
+    clue_html += `<li>${clues_across[i][0]}. ${clues_across[i][1]}</li>`
+  }
+  clue_html += `</ul><br><h2>Down</h2><br><ul></ul>`
+  for (let i = 0; i < clues_across.length; i++) {
+    clue_html += `<li>${clues_down[i][0]}. ${clues_down[i][1]}</li>`
+  }
+  clue_html += `</ul>`
 
   let crossword = html
 
@@ -646,7 +667,7 @@ function generateCrosswordHTML(input, output_json) {
 
   answerKey += '</div><center>';
 
-  return [crossword, answerKey];
+  return [crossword, answerKey, clue_html];
 }
 
 function createPDF(crossword, answers="") {

@@ -46,11 +46,11 @@
 
     <script>
       
-      function convert_to_json(word_list){
+      function convert_to_json(word_list, clue_list){
         var json_data = [];
         for(let i in word_list){
             if(word_list[i].length > 0){
-                json_data[i] = {"answer": word_list[i].toLowerCase()};
+                json_data[i] = {"answer": word_list[i].toLowerCase(), "clue": clue_list[i].toLowerCase()};
             }
         }
 
@@ -73,7 +73,7 @@
         var word_list = document.getElementById("words").value.replace(/[ \r\n,;:-]+/g, ",").split(",");
         var clue_list = document.getElementById("clues").value.replace(/[\r\n]+/g, ",").split(",");
         if(word_list[0] != ""){
-          var input_json = convert_to_json(word_list);
+          var input_json = convert_to_json(word_list, clue_list);
 
           // Output data
           var layout = window.generateLayout(input_json);
@@ -82,9 +82,9 @@
           window.formatClues(clue_list); 
           var crosswordHtml = crosswordHTML[0]
           var answerkeyHtml = crosswordHTML[1]
+          var clue_html = crosswordHTML[2]
       
           //update clue html here
-          clue_html = ""
           crosswordHtml += clue_html
           var doc = window.createPDF(crosswordHtml, answerkeyHtml)
           
