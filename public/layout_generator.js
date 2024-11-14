@@ -509,48 +509,57 @@ function generateCrosswordHTML(input, output_json) {
   <style>
       .crossword-container {
           display: grid;
-          grid-template-columns: repeat(${cols}, 30px);
+          grid-template-columns: repeat(${cols}, 1fr);
           gap: 4px;
-          margin-bottom: 20px;
           padding: 20px;
+          margin-bottom: 20px;
+          margin-top: 20px;
+          max-width: 60%;
+          max-height: 60vh; /* Limit height to 60% of viewport height for PDF */
+          width: auto;
+          height: auto;
+          aspect-ratio: ${cols} / ${rows}; /* Keep width to height ratio */
           border: 2px solid;
-          width: fit-content
+          container-type: inline-size;
       }
       .cell {
-          width: 30px;
-          height: 30px;
+          aspect-ratio: 1;
           display: flex;
           justify-content: center;
           align-items: center;
-          font-size: 20px;
+          font-size: 10cqw;
           border: 1px solid #333;
           background-color: #ffffff;
           position: relative;
       }
       .cell_number {
           width: fit-content;
-          height: 5px;
-          font-size: 12px;
+          height: fit-contet;
+          font-size: 4cqw;
           background-color: #ffffff;
           display: flex;
           justify-content: center;
           position: absolute;
+          margin-left: 2px;
           top: 0;
           left: 0;
       }
       .empty-cell {
           background-color: black;
-          width: 30px;
-          height: 30px;
+          aspect-ratio: 1;
           display: flex;
           justify-content: center;
           align-items: center;
-          font-size: 20px;
           border: 1px solid #333;
+      }
+      .h1 {
+          margin: 30px;
+          font-size: 30px;
+          font-size: 15cqw;
       }
   </style>
 
-  <div class="crossword-container">
+  <center><h1>Crossword</h1><div class="crossword-container">
   `;
 
   let start_positions = []
@@ -568,43 +577,8 @@ function generateCrosswordHTML(input, output_json) {
 
   //console.log(start_positions)
 
-  let answerKey = html
-  // Create the grid based on input
-  let x = 1
-  input.forEach(row => {
-      let y = 1
-      row.forEach(char => {
-          let isNumbered = false
-          const cellClass = char === '-' ? 'empty-cell' : 'cell';
-          let i = 0
-          //This algorithm doesn't seem to work all the time
-          //NEED TO FIX THIS
-
-          for (i = 0; i < start_positions.length; i++) {
-            // console.log("i: " + i + " x: " + x + " y: " + y)
-            // console.log("position x: " + start_positions[i][0] + " position y: " + start_positions[i][1])
-            if ((start_positions[i][0] == x) && (start_positions[i][1] == y)) {
-              isNumbered = true;
-              break;
-            }
-          }
-          answerKey += `<div class="${cellClass}">${char === '-' ? '' : char}`
-          if (isNumbered) {
-            //Create number box with start_position[2], and put in html
-            let position = start_positions[i][2]
-            // console.log("Is Numbered: " + position)
-            answerKey += `<div class="cell_number">${position}</div>`
-          }
-          answerKey += `</div>`;
-          y += 1
-      });
-      x += 1
-  });
-
-  answerKey += '</div>';
-
   let crossword = html
-  x = 1
+  let x = 1
   // Create the grid based on input
   input.forEach(row => {
       let y = 1
@@ -635,7 +609,42 @@ function generateCrosswordHTML(input, output_json) {
       x += 1
   });
 
-  crossword += '</div>';
+  crossword += '</div><center>';
+
+  let answerKey = `<center><h1>Answer Key</h1><div class="crossword-container">`;
+  // Create the grid based on input
+  x = 1
+  input.forEach(row => {
+      let y = 1
+      row.forEach(char => {
+          let isNumbered = false
+          const cellClass = char === '-' ? 'empty-cell' : 'cell';
+          let i = 0
+          //This algorithm doesn't seem to work all the time
+          //NEED TO FIX THIS
+
+          for (i = 0; i < start_positions.length; i++) {
+            // console.log("i: " + i + " x: " + x + " y: " + y)
+            // console.log("position x: " + start_positions[i][0] + " position y: " + start_positions[i][1])
+            if ((start_positions[i][0] == x) && (start_positions[i][1] == y)) {
+              isNumbered = true;
+              break;
+            }
+          }
+          answerKey += `<div class="${cellClass}">${char === '-' ? '' : char}`
+          if (isNumbered) {
+            //Create number box with start_position[2], and put in html
+            let position = start_positions[i][2]
+            // console.log("Is Numbered: " + position)
+            answerKey += `<div class="cell_number">${position}</div>`
+          }
+          answerKey += `</div>`;
+          y += 1
+      });
+      x += 1
+  });
+
+  answerKey += '</div><center>';
 
   return [crossword, answerKey];
 }
@@ -656,7 +665,7 @@ function createPDF(crossword, answers="") {
     //jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
   };
 
-  let element = crossword + answers
+  let element = crossword + '<div class="html2pdf__page-break"></div>' + answers
 
   // Generate PDF
   doc = html2pdf().set(options).from(element) //.save()
