@@ -575,22 +575,21 @@ function generateCrosswordHTML(input, output_json) {
     start_positions.push(starts)
   }
 
-  //console.log(start_positions)
-
   let crossword = html
-  let x = 1
-  // Create the grid based on input
-  input.forEach(row => {
-      let y = 1
-      row.forEach(char => {
+
+  for (let x = 0; x < input.length; x++) {
+      let row = input[x]
+      
+      for (let y = 0; y < row.length; y++) {
+      
+          let char = row[y]
           const cellClass = char === '-' ? 'empty-cell' : 'cell';
           let isNumbered = false
 
           let i = 0
           for (i = 0; i < start_positions.length; i++) {
-            // console.log("i: " + i + " x: " + x + " y: " + y)
-            // console.log("position x: " + start_positions[i][0] + " position y: " + start_positions[i][1])
-            if ((start_positions[i][0] == x) && (start_positions[i][1] == y)) {
+            
+            if ((start_positions[i][0] == (y+1)) && (start_positions[i][1] == (x+1))) {
               isNumbered = true;
               break;
             }
@@ -600,49 +599,47 @@ function generateCrosswordHTML(input, output_json) {
           if (isNumbered) {
             //Create number box with start_position[2], and put in html
             let position = start_positions[i][2]
-            // console.log("Is Numbered: " + position)
+
             crossword += `<div class="cell_number">${position}</div>`
           }
           crossword += `</div>`;
-          y += 1
-      });
-      x += 1
-  });
+          
+      };
+      
+  };
 
   crossword += '</div><center>';
 
   let answerKey = `<center><h1>Answer Key</h1><div class="crossword-container">`;
   // Create the grid based on input
-  x = 1
-  input.forEach(row => {
-      let y = 1
-      row.forEach(char => {
-          let isNumbered = false
+  for (let x = 0; x < input.length; x++) {
+      let row = input[x]
+      
+      for (let y = 0; y < row.length; y++) {
+      
+          let char = row[y]
           const cellClass = char === '-' ? 'empty-cell' : 'cell';
-          let i = 0
-          //This algorithm doesn't seem to work all the time
-          //NEED TO FIX THIS
+          let isNumbered = false
 
+          let i = 0
           for (i = 0; i < start_positions.length; i++) {
-            // console.log("i: " + i + " x: " + x + " y: " + y)
-            // console.log("position x: " + start_positions[i][0] + " position y: " + start_positions[i][1])
-            if ((start_positions[i][0] == x) && (start_positions[i][1] == y)) {
+            
+            if ((start_positions[i][0] == (y+1)) && (start_positions[i][1] == (x+1))) {
               isNumbered = true;
               break;
             }
           }
-          answerKey += `<div class="${cellClass}">${char === '-' ? '' : char}`
+
+          answerKey += `<div class="${cellClass}">${char === '-' ? '' : char}`;
           if (isNumbered) {
             //Create number box with start_position[2], and put in html
             let position = start_positions[i][2]
-            // console.log("Is Numbered: " + position)
+
             answerKey += `<div class="cell_number">${position}</div>`
           }
           answerKey += `</div>`;
-          y += 1
-      });
-      x += 1
-  });
+      };
+  };
 
   answerKey += '</div><center>';
 
