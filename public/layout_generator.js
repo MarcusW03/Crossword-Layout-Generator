@@ -4,7 +4,7 @@
  * MIT License
  */
 
-//var thesaurus = require('powerthesaurus-api')
+//var thesaurus = require('powerthesaurus-api'); 
 //var jsPDF = require('jspdf')
 
 var clueNumbers = {} // key: index in user input, value: clue number 
@@ -376,6 +376,12 @@ function removeIsolatedWords(data){
     //   delete words[wordIndex].position;
     //   words[wordIndex].orientation = "none";
     // }
+
+    //Instead, find an intersecting synonym for all isolated words: 
+    if (word.orientation != "none" && isIsolated){
+      console.log(word.clue); // this is what we need to find a synonym for 
+      console.log(thesaurus(word.clue, synonym))
+    }
   }
 
   // Draw new table
