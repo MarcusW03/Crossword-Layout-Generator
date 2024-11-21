@@ -369,12 +369,13 @@ function removeIsolatedWords(data){
         }
       }
     }
-    if(word.orientation != "none" && isIsolated){
-      delete words[wordIndex].startx;
-      delete words[wordIndex].starty;
-      delete words[wordIndex].position;
-      words[wordIndex].orientation = "none";
-    }
+    // This code removes words with no intersection: 
+    // if(word.orientation != "none" && isIsolated){
+    //   delete words[wordIndex].startx;
+    //   delete words[wordIndex].starty;
+    //   delete words[wordIndex].position;
+    //   words[wordIndex].orientation = "none";
+    // }
   }
 
   // Draw new table
