@@ -65,11 +65,11 @@
 
     <script>
       
-      function convert_to_json(word_list){
+      function convert_to_json(word_list, clue_list){
         var json_data = [];
         for(let i in word_list){
             if(word_list[i].length > 0){
-                json_data[i] = {"answer": word_list[i].toLowerCase()};
+                json_data[i] = {"answer": word_list[i].toLowerCase(), "clue": clue_list[i].toLowerCase()};
             }
         }
 
@@ -92,7 +92,7 @@
         var word_list = document.getElementById("words").value.replace(/[ \r\n,;:-]+/g, ",").split(",");
         var clue_list = document.getElementById("clues").value.replace(/[\r\n]+/g, ",").split(",");
         if(word_list[0] != ""){
-          var input_json = convert_to_json(word_list);
+          var input_json = convert_to_json(word_list, clue_list);
 
           // Output data
           var layouts = generateLayouts(input_json);
@@ -119,6 +119,7 @@
           window.formatClues(clue_list); 
           var crosswordHtml = crosswordHTML[0]
           var answerkeyHtml = crosswordHTML[1]
+          var cluesHtml = crosswordHTML[2]
       
           //update clue html here
           clue_html = ""
@@ -131,7 +132,7 @@
           var table = layout.table; // table as two-dimensional array
           var output_html = layout.table_string; // table as plain text (with HTML line breaks)
           var output_json = layout.result; // words along with orientation, position, startx, and starty
-          //console.log(output_json)
+          //console.log(output_json[0].position);
 
           // Word search data
           //window.crosswordPDF = doc

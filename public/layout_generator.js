@@ -7,6 +7,8 @@
 //var thesaurus = require('powerthesaurus-api')
 //var jsPDF = require('jspdf')
 
+var clueNumbers = {} // key: index in user input, value: clue number 
+
 // Math functions
 function distance(x1, y1, x2, y2){
   return Math.abs(x1 - x2) + Math.abs(y1 - y2);
@@ -85,24 +87,20 @@ function addWord(best, words, table){
 
 function assignPositions(words){
   var positions = {};
-  var clueNumbers = {}; 
   for(let index in words){
     var word = words[index];
     if(word.orientation != "none"){
       var tempStr = word.starty + "," + word.startx;
       if(tempStr in positions){
         word.position = positions[tempStr];
-        clueNumbers[index] = word.position; 
       }
       else{
         // Object.keys is supported in ES5-compatible environments
         positions[tempStr] = Object.keys(positions).length + 1;
         word.position = positions[tempStr];
-        clueNumbers[index] = word.position; 
       }
     }
   }
-  // console.log('clueNumbers: ', clueNumbers); 
 }
 
 function computeDimension(words, factor){
@@ -550,6 +548,7 @@ function generateCrosswordHTML(input, output_json, num = "1", header=true, only_
    *          '--d-' ]
    *  Also, accepts crossword out in json form. 
    *    Ideally used with output of generateLayout().result
+   * words: a list of words entered by the user 
    * Returns empty crossword and answer key as html strings in a list
    *  of form [crossword, answers]
    * 
@@ -679,6 +678,14 @@ function generateCrosswordHTML(input, output_json, num = "1", header=true, only_
   };
 
   crossword += '</div><center>';
+  /*
+  let clues = `<center><h1>Clues</h1><ul>`;
+  //console.log('user_clues', user_clues); 
+  for (let i = 0; i < user_clues.length; i++){
+    clues += `<li>${clueNumbers[i] + user_clues[i]}</li>` 
+  }
+  clues += `</ul>`
+  */
 
   let answerKey = ``
   if (only_answer==true) {
@@ -716,7 +723,7 @@ function generateCrosswordHTML(input, output_json, num = "1", header=true, only_
 
   answerKey += '</div><center>';
 
-  return [crossword, answerKey];
+  return [crossword, answerKey, clues];
 }
 
 function createPDF(crossword, answers="") {
@@ -752,11 +759,3 @@ if(typeof module !== 'undefined'){
   module.exports = { generateLayout, generateCrosswordHTML, createPDF };
 }
 
-function formatClues(input){
-  /*
-  This function takes in the user's input and a dictionary 
-  (clueNumbers) mapping the corresponding words to a position on
-  the puzzle board 
-  */
-  console.log('user input: ', input); 
-}
