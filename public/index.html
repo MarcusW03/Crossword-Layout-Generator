@@ -12,8 +12,27 @@
         color: #444444;
         max-height: 99999999px;
       }
+      .outer-layout-container {
+        display: grid;
+        /*grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));*/
+        grid-template-columns: repeat(1, 1fr);
+        gap: 16px; /* Space between the items */
+        padding: 16px; /* Optional padding for the container */
+        max-width: 100%; /* Ensures responsiveness */
+        box-sizing: border-box; /* Includes padding in the width/height calculations */
+      }
+
+      /* Style for each item */
+      .layout-container {
+        background-color: #f0f0f0; /* Light gray for visibility */
+        border: 1px solid #ccc; /* Optional border */
+        padding: 16px;
+        text-align: center; /* Centers content inside the item */
+        border-radius: 8px; /* Optional for rounded corners */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional shadow */
+      }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js" integrity="sha512-MpDFIChbcXl2QgipQrt1VcPHMldRILetapBl5MPCA9Y8r7qvlwx1/Mc9hNTzY+kS5kX6PdoDq41ws1HiVNLdZA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js" integrity="sha512-YcsIPGdhPK4P/uRW6/sruonlYj+Q7UHWeKfTAkBW+g83NKM+jMJFJ4iAPfSnVp7BKD4dKMHmVSvICUbE/V1sSw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="layout_generator.js"></script>
   </head>
 
@@ -76,9 +95,27 @@
           var input_json = convert_to_json(word_list);
 
           // Output data
-          var layout = window.generateLayout(input_json);
+          var layouts = generateLayouts(input_json);
           // Generate the crossword HTML and log it
-          const crosswordHTML = window.generateCrosswordHTML(layout.table, layout.result);
+          console.log(layouts)
+          var layout = layouts[0]
+          //var htmls = []
+          layouts_html = `
+            <div class="outer-layout-container">`
+          let htmls = []
+          let num = 0
+          layouts.forEach(element => {
+            console.log("layout", element)
+            let this_layout_html = generateCrosswordHTML(element.table, element.result, num, true, true)
+            htmls.push(this_layout_html)
+            // console.log(this_layout_html)
+            // \'' + this_layout_html[0] + '\', \'' + this_layout_html[1] + '\')
+            let button = `<button id="layout-${num}">Download this layout</button>`
+            layouts_html += `<div class="layout-container">` + this_layout_html[1] + button + `</div>`
+            num += 1
+          });
+          layouts_html += `</div>`
+          const crosswordHTML = window.generateCrosswordHTML(layout.table, layout.result, 0);
           window.formatClues(clue_list); 
           var crosswordHtml = crosswordHTML[0]
           var answerkeyHtml = crosswordHTML[1]
@@ -86,7 +123,7 @@
           //update clue html here
           clue_html = ""
           crosswordHtml += clue_html
-          var doc = window.createPDF(crosswordHtml, answerkeyHtml)
+          //var doc = window.createPDF(crosswordHtml, answerkeyHtml)
           
 
           var rows = layout.rows;
@@ -97,18 +134,27 @@
           //console.log(output_json)
 
           // Word search data
-          window.crosswordPDF = doc
+          //window.crosswordPDF = doc
           var alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
           var word_search = create_word_search(alphabet, output_html);
 
-          let downloadButton = `
-            <button onclick="downloadCrossword()">Download Crossword</button>`;
-          // let openButton = `
+          // let downloadButton = `
+          //   <button onclick="downloadCrossword()">Download Crossword</button>`;
+          // // let openButton = `
           //   <button onclick="openpdf()">Open Crossword</button>`;
 
           // Display result
-          document.getElementById("content").innerHTML = "<h3>Output JSON</h3><br>" + JSON.stringify(output_json) + "<br><br><h3>Output Html</h3><br>" + output_html + "<br><h3>Extra Output: Word Search</h3><br>" + word_search + "<br><br>" + downloadButton +  "<br>" + crosswordHtml + "<br>" + answerkeyHtml; //add clue html here;
-          openpdf(doc)
+          
+          document.getElementById("content").innerHTML = "<h3>Output JSON</h3><br>" + JSON.stringify(output_json) + "<br><br><h3>Output Html</h3><br>" + output_html + "<br><h3>Extra Output: Word Search</h3><br>" + word_search + "<br><br>" + layouts_html; //add clue html here;
+          //openpdf(doc)
+
+          for (let i = 0; i < htmls.length; i++) {
+            console.log("layout-"+i)
+            document.getElementById("layout-"+i).addEventListener("click", function() {
+              //console.log(layouts[i])  
+              make_and_download_pdf(layouts[i].table, layouts[i].result);
+            });
+          }
         }
         
       }
@@ -119,6 +165,18 @@
 
       function downloadCrossword() {
         window.crosswordPDF.save('crossword.pdf');
+      }
+
+      function make_and_download_pdf(table, result) {
+        //console.log("num:", num)
+        //console.log(crossword)
+        let html = generateCrosswordHTML(table, result)
+        //console.log("html: ", html[0])
+        let doc = createPDF(html[0], html[1])
+        console.log(doc)
+        //console.log(doc)
+        //doc.output('dataurlnewwindow')
+        doc.save()
       }
     </script>
 
