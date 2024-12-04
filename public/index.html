@@ -69,7 +69,12 @@
         var json_data = [];
         for(let i in word_list){
             if(word_list[i].length > 0){
-                json_data[i] = {"answer": word_list[i].toLowerCase(), "clue": clue_list[i].toLowerCase()};
+                json_data[i] = {"answer": word_list[i].toLowerCase()};
+            }
+        }
+        for(let i in clue_list) {
+          if(clue_list[i].length > 0){
+                json_data[i] = {"clue": clue_list[i].toLowerCase()};
             }
         }
 
@@ -116,7 +121,7 @@
           });
           layouts_html += `</div>`
           const crosswordHTML = window.generateCrosswordHTML(layout.table, layout.result, 0);
-          window.formatClues(clue_list); 
+          //window.formatClues(clue_list); 
           var crosswordHtml = crosswordHTML[0]
           var answerkeyHtml = crosswordHTML[1]
           var cluesHtml = crosswordHTML[2]
