@@ -558,8 +558,15 @@ function generateCrosswordHTML(input, output_json) {
       }
       .h1 {
           margin: 30px;
-          font-size: 30px;
+          font-size: 1000px;
           font-size: 15cqw;
+          text align: center;
+      }
+      .clue-style {
+          margin: 30px;
+          font-size: 1000px;
+          font-size: 15cqw;
+          text align: center;
       }
   </style>
 
