@@ -5,16 +5,16 @@
  */
 
 var thesaurus = require('powerthesaurus-api')
-//var jspd = require('html2pdf.js')
 //var { jsPDF } = require("jspdf");
-var jsdom = require("jsdom");
-var { JSDOM } = jsdom;
-var { window } = new JSDOM("");
-const html2canvas = require("html2canvas")
-const pdfMake = require('pdfmake/build/pdfmake');
-var pdfFonts = require("pdfmake/build/vfs_fonts");
-pdfMake.vfs = pdfFonts.vfs;
-const htmlToPdfmake = require('html-to-pdfmake');
+// var jsdom = require("jsdom");
+// var { JSDOM } = jsdom;
+// var { window } = new JSDOM("");
+// var html2pdf = require('html2pdf.js')
+// const html2canvas = require("html2canvas")
+// const pdfMake = require('pdfmake/build/pdfmake');
+// var pdfFonts = require("pdfmake/build/vfs_fonts");
+// pdfMake.vfs = pdfFonts.vfs;
+// const htmlToPdfmake = require('html-to-pdfmake');
 
 var clueNumbers = {} // key: index in user input, value: clue number 
 
@@ -745,77 +745,81 @@ function generateCrosswordHTML(input, output_json, num = "1", header=true, only_
   return [crossword, answerKey, clues];
 }
 
-async function createPDF(crossword, answers="") {
-  /*
-  This function takes in a crossword as HTML and then returns
-    it as a PDF. Takes in as one html item, or optionally as 
-    a separate crossword and answer key html
-   */
-  // const options = {
-  //   margin:       .25,
-  //   filename:     'crossword.pdf',
-  //   image:        { type: 'jpeg', quality: 0.98 },
-  //   html2canvas:  { dpi: 96, letterRendering: true },
-  //   jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-  // };
+// async function createPDF(crossword, answers="") {
+//   /*
+//   This function takes in a crossword as HTML and then returns
+//     it as a PDF. Takes in as one html item, or optionally as 
+//     a separate crossword and answer key html
+//    */
+//   const options = {
+//     margin:       .25,
+//     filename:     'crossword.pdf',
+//     image:        { type: 'jpeg', quality: 0.98 },
+//     html2canvas:  { dpi: 96, letterRendering: true },
+//     jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+//   };
 
-  let element = crossword + "<br>" + '<span class="pdf-pagebreak-before"></span>' + answers
+//   let element = crossword + "<br>" + '<span class="pdf-pagebreak-before"></span>' + answers
 
-  element = htmlToPdfmake(element, { window })
-  // Generate PDF
-  console.log("inside pdf function", element)
+//   // element = htmlToPdfmake(element, { window })
+//   // // Generate PDF
+//   console.log("inside pdf function", element)
+
+//   doc = html2pdf().from(element, "string").set(options).toContainer().toCanvas().toPdf()
+
+//   return doc
   
-  html2canvas(crossword).then(canvas => {
-    var cross_data = canvas.toDataUrl();
-    console.log("here 1")
-    html2canvas(answers).then(async canvas => {
-      console.log("here 2")
-      var answ_data = canvas.toDataUrl();
-      docDefinition = {
-        content:  [
-          {image: cross_data, height: 600, width: 'auto', pageBreak: 'before'},
-          {image: answ_data, height: 600, width: 'auto', pageBreak: 'after'},
-        ]
-      }
-      var doc = pdfMake.createPdf(docDefinition)
+//   // html2canvas(crossword).then(canvas => {
+//   //   var cross_data = canvas.toDataUrl();
+//   //   console.log("here 1")
+//   //   html2canvas(answers).then(async canvas => {
+//   //     console.log("here 2")
+//   //     var answ_data = canvas.toDataUrl();
+//   //     docDefinition = {
+//   //       content:  [
+//   //         {image: cross_data, height: 600, width: 'auto', pageBreak: 'before'},
+//   //         {image: answ_data, height: 600, width: 'auto', pageBreak: 'after'},
+//   //       ]
+//   //     }
+//   //     var doc = pdfMake.createPdf(docDefinition)
 
-      doc.getDataUrl((data) => {Blob = data})
+//   //     doc.getDataUrl((data) => {Blob = data})
       
-      await new Promise(r => setTimeout(r, 500));
-      console.log("here 3")
+//   //     await new Promise(r => setTimeout(r, 500));
+//   //     console.log("here 3")
       
-      return Blob
-      })
-  })
-  // // var doc = new jsPDF();  
-  // var docDefinition = {
-  //   content: [
-  //     element
-  //   ],
-  //   pageBreakBefore: function(currentNode) {
-  //     // we add a page break before elements with the classname "pdf-pagebreak-before"
-  //     return currentNode.style && currentNode.style.indexOf('pdf-pagebreak-before') > -1;
-  //   }
-  // };
+//   //     return Blob
+//   //     })
+//   // })
+//   // // var doc = new jsPDF();  
+//   // var docDefinition = {
+//   //   content: [
+//   //     element
+//   //   ],
+//   //   pageBreakBefore: function(currentNode) {
+//   //     // we add a page break before elements with the classname "pdf-pagebreak-before"
+//   //     return currentNode.style && currentNode.style.indexOf('pdf-pagebreak-before') > -1;
+//   //   }
+//   // };
 
-  // var doc = pdfMake.createPdf(docDefinition)
-  // //doc = html2pdf().from(element, "string").set(options).toContainer().toCanvas().toPdf()
-  // console.log("hereee")
-  // var Blob = ""
-  // doc.getDataUrl((data) => {Blob = data})
-  // // while (Blob === "") {
-  // //   continue;
-  // // }
-  // await new Promise(r => setTimeout(r, 500));
-  // //console.log(Blob)
-  // // console.log("here")
-  // //console.log(Blob)
+//   // var doc = pdfMake.createPdf(docDefinition)
+//   // //doc = html2pdf().from(element, "string").set(options).toContainer().toCanvas().toPdf()
+//   // console.log("hereee")
+//   // var Blob = ""
+//   // doc.getDataUrl((data) => {Blob = data})
+//   // // while (Blob === "") {
+//   // //   continue;
+//   // // }
+//   // await new Promise(r => setTimeout(r, 500));
+//   // //console.log(Blob)
+//   // // console.log("here")
+//   // //console.log(Blob)
   
-  // return Blob;
-}
+//   // return Blob;
+// }
 
 //The following was added to support Node.js
 if(typeof module !== 'undefined'){
-  module.exports = { generateLayout, generateLayouts, generateCrosswordHTML, createPDF };
+  module.exports = { generateLayout, generateLayouts, generateCrosswordHTML };
 }
 
