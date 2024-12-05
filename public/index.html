@@ -179,6 +179,18 @@
         //doc.output('dataurlnewwindow')
         doc.save()
       }
+
+      function make_and_download_pdf(table, result) {
+        //console.log("num:", num)
+        //console.log(crossword)
+        let html = generateCrosswordHTML(table, result)
+        //console.log("html: ", html[0])
+        let doc = createPDF(html[0], html[1])
+        console.log(doc)
+        //console.log(doc)
+        //doc.output('dataurlnewwindow')
+        doc.save()
+      }
     </script>
 
     <br><br>
