@@ -33,7 +33,7 @@
       }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js" integrity="sha512-YcsIPGdhPK4P/uRW6/sruonlYj+Q7UHWeKfTAkBW+g83NKM+jMJFJ4iAPfSnVp7BKD4dKMHmVSvICUbE/V1sSw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="layout_generator.js"></script>
+    <!-- <script src="layout_generator.js"></script> -->
   </head>
 
   <body>
@@ -64,6 +64,96 @@
     </center>
 
     <script>
+
+      function createPDF(crossword, answers="") {
+        const options = {
+            margin:       .25,
+            filename:     'crossword.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { dpi: 96, letterRendering: true },
+            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+
+        let element = crossword + "<br>" + '<div class="html2pdf__page-break"></div>' + answers
+
+        // // Generate PDF
+        //console.log("inside pdf function", element)
+
+        doc = html2pdf().from(element, "string").set(options).toContainer().toCanvas().toPdf()
+
+        return doc
+      }
+
+      async function generateLayout(words_json) {
+        return fetch('/generateLayout', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ words_json }), // Send as JSON
+        })
+          .then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                return data.layout
+              } else {
+                console.log("Failed to generate the layout")
+              }
+          })
+          .catch(err => {
+              console.error('Fetch error:', err);
+              return null
+          });
+      }
+
+      function generateLayouts(words_json) {
+        //console.log("Inside generateLayouts in html")
+        //console.log("sending these words", words_json)
+        return fetch('/generateLayouts', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ words_json }), // Send as JSON
+        })
+          .then(response => response.json())
+          .then(data => {
+              //console.log("Inside .then in generateLayouts in html")
+              //console.log(data)
+              if (data.success) {
+                return data.layout
+              } else {
+                console.log("Failed to generate Layouts")
+              }
+          })
+          .catch(err => {
+              
+              console.error('Fetch error:', err);
+              return null
+          });
+      }
+
+      async function generateCrosswordHTML(input, output_json, num = "1", header=true, only_answer=false) {
+        return fetch('/generateCrosswordHTML', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ input, output_json, num, header, only_answer }), // Send as JSON
+        })
+          .then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                return [data.crossword, data.answerKey, data.clues]  
+              } else {
+                console.log("Failed to generate the html")
+              }
+          })
+          .catch(err => {
+              console.error('Fetch error:', err);
+              return null
+          });
+      }
       
       function convert_to_json(word_list, clue_list){
         var json_data = [];
@@ -92,7 +182,7 @@
         return tableArray.join("");
       }
 
-      function button_clicked(){
+      async function button_clicked(){
         // Input data
         var word_list = document.getElementById("words").value.replace(/[ \r\n,;:-]+/g, ",").split(",");
         var clue_list = document.getElementById("clues").value.replace(/[\r\n]+/g, ",").split(",");
@@ -100,27 +190,28 @@
           var input_json = convert_to_json(word_list, clue_list);
 
           // Output data
-          var layouts = generateLayouts(input_json);
+          var layouts = ''
+          layouts = await generateLayouts(input_json);
           // Generate the crossword HTML and log it
-          console.log(layouts)
+          //console.log(layouts)
           var layout = layouts[0]
           //var htmls = []
           layouts_html = `
             <div class="outer-layout-container">`
           let htmls = []
           let num = 0
-          layouts.forEach(element => {
-            console.log("layout", element)
-            let this_layout_html = generateCrosswordHTML(element.table, element.result, num, true, true)
+          for (const element of layouts) {
+            //console.log("layout", element)
+            let this_layout_html = await generateCrosswordHTML(element.table, element.result, num, true, true)
             htmls.push(this_layout_html)
             // console.log(this_layout_html)
             // \'' + this_layout_html[0] + '\', \'' + this_layout_html[1] + '\')
             let button = `<button id="layout-${num}">Download this layout</button>`
             layouts_html += `<div class="layout-container">` + this_layout_html[1] + button + `</div>`
             num += 1
-          });
+          };
           layouts_html += `</div>`
-          const crosswordHTML = window.generateCrosswordHTML(layout.table, layout.result, 0);
+          const crosswordHTML = await generateCrosswordHTML(layout.table, layout.result, 0);
           //window.formatClues(clue_list); 
           var crosswordHtml = crosswordHTML[0]
           var answerkeyHtml = crosswordHTML[1]
@@ -155,7 +246,7 @@
           //openpdf(doc)
 
           for (let i = 0; i < htmls.length; i++) {
-            console.log("layout-"+i)
+            //console.log("layout-"+i)
             document.getElementById("layout-"+i).addEventListener("click", function() {
               //console.log(layouts[i])  
               make_and_download_pdf(layouts[i].table, layouts[i].result);
@@ -173,28 +264,21 @@
         window.crosswordPDF.save('crossword.pdf');
       }
 
-      function make_and_download_pdf(table, result) {
+      async function make_and_download_pdf(table, result) {
         //console.log("num:", num)
         //console.log(crossword)
-        let html = generateCrosswordHTML(table, result)
+        let html = await generateCrosswordHTML(table, result)
         //console.log("html: ", html[0])
         let doc = createPDF(html[0], html[1])
-        console.log(doc)
         //console.log(doc)
-        //doc.output('dataurlnewwindow')
-        doc.save()
-      }
 
-      function make_and_download_pdf(table, result) {
-        //console.log("num:", num)
-        //console.log(crossword)
-        let html = generateCrosswordHTML(table, result)
-        //console.log("html: ", html[0])
-        let doc = createPDF(html[0], html[1])
-        console.log(doc)
-        //console.log(doc)
-        //doc.output('dataurlnewwindow')
         doc.save()
+          
+        // let pdfWindow = window.open("");
+        // pdfWindow.document.write("<html<head><title>"+"Crossword"+"</title><style>body{margin: 0px;}</style></head>");
+        // pdfWindow.document.write("<body><embed width='100%' height='100%' src=" + doc +"#toolbar=0&navpanes=0&scrollbar=0'></embed></body></html>");
+        // pdfWindow.document.close();
+
       }
     </script>
 
