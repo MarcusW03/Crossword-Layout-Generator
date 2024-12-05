@@ -401,11 +401,12 @@ function removeIsolatedWords(data){
 
   //Find an intersecting synonym for all isolated words: 
   for (let i = 0; i < island.length; i++){
-    //console.log('here'); 
-    //console.log('word: ', words[island[i]].answer); 
     var synonyms = thesaurus.find(words[island[i]].answer)
-    // TODO: edit synonyms to remove spaces from multi-word entries
-    //console.log(synonyms)
+    // edit synonyms to remove spaces from entries: 
+    for (let k = 0; k < synonyms.length; k++){
+      synonyms[k] = synonyms[k].split(" ").join(""); 
+    }
+    console.log(synonyms)
     var max = synonyms.length < 3 ? synonyms.length : 3
     for (let j = 0; j < max; j++){
       console.log('synonym: ', synonyms[j]); 
