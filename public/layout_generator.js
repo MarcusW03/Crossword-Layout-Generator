@@ -309,12 +309,13 @@ function generateTable(table, rows, cols, words, weights){
   return {"table": table, "result": words};
 }
 
-function removeIsolatedWords(data){
+function findWordIntersections(data){
   var oldTable = data.table;
   var words = data.result;
   var rows = oldTable.length;
   var cols = oldTable[0].length;
   var newTable = initTable(rows, cols);
+  var island = []
 
   // Draw intersections as "X"'s
   for(let wordIndex in words){
@@ -368,22 +369,36 @@ function removeIsolatedWords(data){
           break;
         }
       }
-    }
-    // This code removes words with no intersection: 
-    // if(word.orientation != "none" && isIsolated){
-    //   delete words[wordIndex].startx;
-    //   delete words[wordIndex].starty;
-    //   delete words[wordIndex].position;
-    //   words[wordIndex].orientation = "none";
-    // }
+    } 
 
-    //Instead, find an intersecting synonym for all isolated words: 
-    if (word.orientation != "none" && isIsolated){
-      //console.log(word.clue); // this is what we need to find a synonym for 
-      //console.log(thesaurus(word, 'synonyms')); 
-      console.log(lookup(word));
-   }
+    if(word.orientation != "none" && isIsolated){
+      // add all indices of isolated words to island
+      island.push(wordIndex); 
+    }
   }
+
+  return island; 
+  
+}
+
+function removeIsolatedWords(data){
+    var island = findWordIntersections(data);
+    var oldTable = data.table;
+    var words = data.result;
+    var rows = oldTable.length;
+    var cols = oldTable[0].length;
+    var newTable = initTable(rows, cols);
+    let synonyms = ['boys', 'males']; 
+  
+    //Find an intersecting synonym for all isolated words: 
+    for (let i = 0; i < island.length; i++){
+      for (let j = 0; j < synonyms.length; j++){
+        console.log(synonyms[j]); 
+        words[island[i]].answer = synonyms[j]; 
+        var islandLst = findWordIntersections(data); 
+      }
+    }
+  
   // Draw new table
   newTable = initTable(rows, cols);
   for(let wordIndex in words){
@@ -476,6 +491,7 @@ function tableToString(table, delim){
 }
 
 function generateSimpleTable(words){
+  console.log("words in gST: ", words); 
   var rows = computeDimension(words, 3);
   var cols = rows;
   var blankTable = initTable(rows, cols);
@@ -517,7 +533,7 @@ function generateLayouts(words_json) {
     words_json = shuffle(words_json)
     //removed = words_json.splice((Math.floor(length/2)), 1)
     let new_words = JSON.parse(JSON.stringify(words_json)) //Deep Copy
-    console.log(new_words)
+    //console.log(new_words)
     // console.log("new_words", new_words)
     // console.log("words_json", words_json)
     //console.log("count", count)
