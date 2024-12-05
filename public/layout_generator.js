@@ -750,7 +750,7 @@ function generateCrosswordHTML(input, output_json, num = "1", header=true, only_
   return [crossword, answerKey, clue_html];
 }
 
-function createPDF(crossword, answers="") {
+function createPDF(crossword, answers="", clue) {
   /*
   This function takes in a crossword as HTML and then returns
     it as a PDF. Takes in as one html item, or optionally as 
@@ -764,11 +764,12 @@ function createPDF(crossword, answers="") {
     jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
   };
 
-  let element = crossword + '<div class="html2pdf__page-break"></div>' + answers
+  let element = crossword + '<br>' + clue + '<div class="html2pdf__page-break"></div>' + answers 
 
   
 
   // Generate PDF
+  console.log(element)
   console.log("inside pdf function")
   //console.log("element: ", element)
   // doc = html2pdf().from("<h1>Crossword</h1>").set(options).toPdf().get('pdf').then(function (pdf) {
