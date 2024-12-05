@@ -385,19 +385,34 @@ function removeIsolatedWords(data){
     var island = findWordIntersections(data);
     var oldTable = data.table;
     var words = data.result;
+    //let new_words = JSON.parse(JSON.stringify(words)) 
     var rows = oldTable.length;
     var cols = oldTable[0].length;
     var newTable = initTable(rows, cols);
-    let synonyms = ['boys', 'males']; 
-  
+    //let synonyms = ['boys', 'males']; 
+    var synonymUsed = false; 
+
     //Find an intersecting synonym for all isolated words: 
     for (let i = 0; i < island.length; i++){
+      console.log('island: ', words[island[i]]); 
       for (let j = 0; j < synonyms.length; j++){
-        console.log(synonyms[j]); 
+        console.log('synonym: ', synonyms[j]); 
         words[island[i]].answer = synonyms[j]; 
         var islandLst = findWordIntersections(data); 
+        if (islandLst.length < island.length){
+          synonymUsed = true; 
+          break; 
+        }
+      }
+      console.log('synonymUsed: ', synonymUsed); 
+      if (!synonymUsed){
+        delete words[island[i]].startx;
+        delete words[island[i]].starty;
+        delete words[island[i]].position;
+        words[island[i]].orientation = "none";
       }
     }
+
   
   // Draw new table
   newTable = initTable(rows, cols);
@@ -491,7 +506,7 @@ function tableToString(table, delim){
 }
 
 function generateSimpleTable(words){
-  console.log("words in gST: ", words); 
+  //console.log("words in gST: ", words); 
   var rows = computeDimension(words, 3);
   var cols = rows;
   var blankTable = initTable(rows, cols);
