@@ -379,11 +379,11 @@ function removeIsolatedWords(data){
 
     //Instead, find an intersecting synonym for all isolated words: 
     if (word.orientation != "none" && isIsolated){
-      console.log(word.clue); // this is what we need to find a synonym for 
-      console.log(thesaurus(word.clue, synonym))
-    }
+      //console.log(word.clue); // this is what we need to find a synonym for 
+      //console.log(thesaurus(word, 'synonyms')); 
+      console.log(lookup(word));
+   }
   }
-
   // Draw new table
   newTable = initTable(rows, cols);
   for(let wordIndex in words){
@@ -689,4 +689,3 @@ function createPDF(crossword, answers="") {
 if(typeof module !== 'undefined'){
   module.exports = { generateLayout, generateCrosswordHTML, createPDF };
 }
-
