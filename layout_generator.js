@@ -4,7 +4,8 @@
  * MIT License
  */
 
-var thesaurus = require('powerthesaurus-api')
+var thesaurus = require("thesaurus")
+//var thesaurus = require('powerthesaurus-api')
 //var { jsPDF } = require("jspdf");
 // var jsdom = require("jsdom");
 // var { JSDOM } = jsdom;
@@ -318,12 +319,13 @@ function generateTable(table, rows, cols, words, weights){
   return {"table": table, "result": words};
 }
 
-function removeIsolatedWords(data){
+function findWordIntersections(data){
   var oldTable = data.table;
   var words = data.result;
   var rows = oldTable.length;
   var cols = oldTable[0].length;
   var newTable = initTable(rows, cols);
+  var island = []
 
   // Draw intersections as "X"'s
   for(let wordIndex in words){
@@ -377,13 +379,50 @@ function removeIsolatedWords(data){
           break;
         }
       }
-    }
+    } 
+
     if(word.orientation != "none" && isIsolated){
-      delete words[wordIndex].startx;
-      delete words[wordIndex].starty;
-      delete words[wordIndex].position;
-      words[wordIndex].orientation = "none";
+      // add all indices of isolated words to island
+      island.push(wordIndex); 
     }
+  }
+
+  return island; 
+}
+
+function removeIsolatedWords(data){
+  var island = findWordIntersections(data);
+  var oldTable = data.table;
+  var words = data.result;
+  var rows = oldTable.length;
+  var cols = oldTable[0].length;
+  var newTable = initTable(rows, cols);
+  var synonymUsed = false; 
+
+  //Find an intersecting synonym for all isolated words: 
+  for (let i = 0; i < island.length; i++){
+    //console.log('here'); 
+    //console.log('word: ', words[island[i]].answer); 
+    var synonyms = thesaurus.find(words[island[i]].answer)
+    // TODO: edit synonyms to remove spaces from multi-word entries
+    //console.log(synonyms)
+    var max = synonyms.length < 3 ? synonyms.length : 3
+    for (let j = 0; j < max; j++){
+      console.log('synonym: ', synonyms[j]); 
+      words[island[i]].answer = synonyms[j]; 
+      var islandLst = findWordIntersections(data); 
+      if (islandLst.length < island.length){
+        synonymUsed = true; 
+        break; 
+      }
+    }
+    console.log('synonymUsed: ', synonymUsed); 
+    // if (!synonymUsed){
+    //   delete words[island[i]].startx;
+    //   delete words[island[i]].starty;
+    //   delete words[island[i]].position;
+    //   words[island[i]].orientation = "none";
+    // }
   }
 
   // Draw new table
@@ -511,12 +550,14 @@ function generateLayouts(words_json) {
     length = 10
   }
   let layouts = []
+  layouts.push(generateLayout(words_json))
 
   for (let i = 0; i < length; i++) {
     let removed = words_json.shift()
     //console.log("words_json removed", first)
     //let count = words_json.push(first)
     words_json = shuffle(words_json)
+    console.log('words_json ', words_json); 
     //removed = words_json.splice((Math.floor(length/2)), 1)
     let new_words = JSON.parse(JSON.stringify(words_json)) //Deep Copy
     console.log(new_words)
