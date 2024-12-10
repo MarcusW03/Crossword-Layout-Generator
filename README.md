@@ -1,4 +1,20 @@
 # Crossword Layout Generator - Open Source
+
+## Our Forked Version
+We include a couple of additions in our forked version of CrossWord Layout Generator.
+
+To use our repo, you can follow these steps. 
+- clone our repo
+- npm init inside of the repo
+- install our dependencies
+  - npm install body-parser
+  - npm install express
+  - npm install thesaurus
+- run the server
+  - node index.js
+
+Then, you'll be able to access the Crossword Layout Generator in your broswer at localhost:5001/home. 
+
 ## Introduction
 A crossword consists of clues, answers, and a layout:
 - The answers are the hidden words that the player is trying to guess.
