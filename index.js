@@ -60,6 +60,7 @@ app.post('/generateCrosswordHTML', (req, res) => {
         let layouts = generateCrosswordHTML(input, output_json, num, header, only_answer)
         res.json({ success: true, crossword: layouts[0], answerKey: layouts[1], clues: layouts[2]});
     } catch (error) {
+        console.log(error)
         res.status(500).json({ success: false, error: error.message });
     }
 });
