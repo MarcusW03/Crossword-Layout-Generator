@@ -65,7 +65,7 @@
 
     <script>
 
-      function createPDF(crossword, answers="") {
+      function createPDF(crossword, answers="", clues) {
         const options = {
             margin:       .25,
             filename:     'crossword.pdf',
@@ -74,7 +74,7 @@
             jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
         };
 
-        let element = crossword + "<br>" + '<div class="html2pdf__page-break"></div>' + answers
+        let element = crossword + "<p>" + clues + "</p>" + "<br>" + '<div class="html2pdf__page-break"></div>' + answers
 
         // // Generate PDF
         //console.log("inside pdf function", element)
@@ -167,7 +167,6 @@
                 json_data[i]["clue"] = clue_list[i].toLowerCase();
             }
         }
-
         return json_data;
       }
 
@@ -269,7 +268,7 @@
         //console.log(crossword)
         let html = await generateCrosswordHTML(table, result)
         //console.log("html: ", html[0])
-        let doc = createPDF(html[0], html[1])
+        let doc = createPDF(html[0], html[1], html[2])
         //console.log(doc)
 
         doc.save()
