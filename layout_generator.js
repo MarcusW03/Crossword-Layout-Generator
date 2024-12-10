@@ -4,6 +4,7 @@
  * MIT License
  */
 
+const e = require("express");
 var thesaurus = require("thesaurus")
 //var thesaurus = require('powerthesaurus-api')
 //var { jsPDF } = require("jspdf");
@@ -18,7 +19,7 @@ var thesaurus = require("thesaurus")
 // const htmlToPdfmake = require('html-to-pdfmake');
 
 var clueNumbers = {} // key: index in user input, value: clue number 
-
+var SYNONYMS = true 
 // Math functions
 function distance(x1, y1, x2, y2){
   return Math.abs(x1 - x2) + Math.abs(y1 - y2);
@@ -383,53 +384,64 @@ function findWordIntersections(data){
 
     if(word.orientation != "none" && isIsolated){
       // add all indices of isolated words to island
-      island.push(wordIndex); 
+        island.push(wordIndex); 
+        if (!SYNONYMS){
+          delete word.startx;
+          delete word.starty;
+          delete word.position;
+          word.orientation = "none";
+        }
     }
   }
 
-  return island; 
+  return [island, newTable]; 
 }
 
 function removeIsolatedWords(data){
-  var island = findWordIntersections(data);
+  var intersectionData = findWordIntersections(data); 
+  var island = intersectionData[0];
+  var newTable = intersectionData[1]; 
   var oldTable = data.table;
   var words = data.result;
   var rows = oldTable.length;
   var cols = oldTable[0].length;
-  var newTable = initTable(rows, cols);
-  var synonymUsed = false; 
-
-  //Find an intersecting synonym for all isolated words: 
-  for (let i = 0; i < island.length; i++){
-    var synonyms = thesaurus.find(words[island[i]].answer)
-    // edit synonyms to remove spaces from entries: 
-    for (let k = 0; k < synonyms.length; k++){
-      synonyms[k] = synonyms[k].split(" ").join(""); 
-    }
-    console.log(synonyms)
-    var max = synonyms.length < 3 ? synonyms.length : 3
-    for (let j = 0; j < max; j++){
-      console.log('synonym: ', synonyms[j]); 
-      words[island[i]].answer = synonyms[j]; 
-      var islandLst = findWordIntersections(data); 
-      if (islandLst.length < island.length){
-        synonymUsed = true; 
-        break; 
+  
+  if(SYNONYMS){
+    //Find an intersecting synonym for all isolated words: 
+    for (let i = 0; i < island.length; i++){
+      var synonyms = thesaurus.find(words[island[i]].answer)
+      // edit synonyms to remove spaces from entries: 
+      for (let k = 0; k < synonyms.length; k++){
+        synonyms[k] = synonyms[k].split(" ").join(""); 
+      }
+      //console.log(synonyms)
+      var max = synonyms.length < 3 ? synonyms.length : 3
+      for (let j = 0; j < max; j++){
+        words[island[i]].answer = synonyms[j]; 
+        intersectionData = findWordIntersections(data); 
+        var islandLst = intersectionData[0];
+        newTable = intersectionData[1]; 
+        if (islandLst.length < island.length){
+          break; 
+        }
       }
     }
-    console.log('synonymUsed: ', synonymUsed); 
-    // if (!synonymUsed){
-    //   delete words[island[i]].startx;
-    //   delete words[island[i]].starty;
-    //   delete words[island[i]].position;
-    //   words[island[i]].orientation = "none";
-    // }
+    if (j == max){
+      SYNONYMS = false; 
+      for (let i = 0; i < island.length; i++){
+        delete words[island[i]].startx;
+        delete words[island[i]].starty;
+        delete words[island[i]].position;
+        words[island[i]].orientation = "none";
+      }
+      generateSimpleTable(words)
+    }
   }
-
   // Draw new table
   newTable = initTable(rows, cols);
   for(let wordIndex in words){
     var word = words[wordIndex];
+    //console.log('word (trying to generate Table): ', word)
     if(word.orientation == "across"){
       var i = word.starty - 1;
       var j = word.startx - 1;
