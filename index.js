@@ -1,49 +1,87 @@
+/*
+ * This is simple testing file to run locally. This file allows you to interact
+ *  with the layoutgenerator, and to access it's api via browser.
+ * */
+
 // set up Express
 var express = require('express');
+const bodyParser = require('body-parser');
+
 var app = express();
 
-//const { jsPDF } = require("jspdf"); // will automatically load the node version
+const { generateLayout, generateLayouts, generateCrosswordHTML } = require('./layout_generator.js')
 
-// set up BodyParser
-// var bodyParser = require('body-parser');
-// app.use(bodyParser.urlencoded({ extended: true }));
+//app.use(express.static('public'))
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
 
-// set up EJS
-//app.set('view engine', 'ejs');
-app.use(express.static('public'))
+app.post('/generateLayout', (req, res) => {
+    const { words_json } = req.body; // Expecting an array of words with clues and answers
+    if (!words_json || !Array.isArray(words_json)) {
+        return res.status(400).json({ error: 'Invalid input format. Expecting an array of word objects.' });
+    }
 
-// input_json = [{"clue":"that which is established as a rule or model by authority, custom, or general consent","answer":"standard"},{"clue":"a machine that computes","answer":"computer"},{"clue":"the collective designation of items for a particular purpose","answer":"equipment"},{"clue":"an opening or entrance to an inclosed place","answer":"port"},{"clue":"a point where two things can connect and interact","answer":"interface"}]
-// var clg = require("crossword-layout-generator");
-// var layout = clg.generateLayout(input_json)
-// var rows = layout.rows;
-// var cols = layout.cols;
-// var table = layout.table; // table as two-dimensional array
-// var output_html = layout.table_string; // table as plain text (with HTML line breaks)
-// var output_json = layout.result; // words along with orientation, position, startx, and starty
+    try {
+        const layout = generateLayout(words_json);
+        res.json(layout);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred while generating the layout.' });
+    }
+});
 
-app.use('/', (req, res) => {
+app.post('/generateLayouts', (req, res) => {
+    
+    //console.log("Inside index.js generateLayouts")
+    
+    const { words_json } = req.body; // Expecting an array of words with clues and answers
+    //console.log(words_json)
+    if (!words_json || !Array.isArray(words_json)) {
+        return res.status(400).json({ error: 'Invalid input format. Expecting an array of word objects.' });
+    }
 
-    //console.log(output_json)
-    res.sendFile(__dirname + '/public/index.html')
-    //res.render("index")
+    try {
+        const layouts = generateLayouts(words_json);
+        res.json({ success: true, layout: layouts});
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred while generating the layout.' });
+    }
+});
+
+app.post('/generateCrosswordHTML', (req, res) => {
+    const {input, output_json, num , header, only_answer} = req.body; 
+    if (!Array.isArray(input) || input.length === 0) {
+        return res.status(400).json({ success: false, error: 'Invalid or missing "input" array' });
+    }
+
+    try {
+        let layouts = generateCrosswordHTML(input, output_json, num, header, only_answer)
+        res.json({ success: true, crossword: layouts[0], answerKey: layouts[1], clues: layouts[2]});
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// app.post('/createPDF', async (req, res) => {
+//     const {crossword, answers} = req.body; 
+
+//     try {
+//         let doc = await createPDF(crossword, answers)
+//         //console.log("here, ", doc)
+//         res.json({ success: true, pdf: doc});
+//     } catch (error) {
+//         res.status(500).json({ success: false, error: error.message });
+//     }
+// });
+
+app.use('/home', (req, res) => {
+
+    res.sendFile(__dirname + '/views/index.html')
 
 }); 
 
-// app.use("layout_generator.js", (req, res) => {
-//     res.send('layout_generator.js')
-// })
-
-
-/*************************************************
-Do not change anything below here!
-*************************************************/
-
-//app.use('/public', express.static('public'));
-
-// this redirects any other request to the "all" endpoint
-//app.use('/', (req, res) => { res.redirect('/home'); } );
-
-// this port number has been assigned to your group
 var port = 5001
 
 app.listen(port,  () => {
