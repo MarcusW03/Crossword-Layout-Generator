@@ -511,6 +511,7 @@ function generateLayouts(words_json) {
     length = 10
   }
   let layouts = []
+  layouts.push(generateLayout(words_json))
 
   for (let i = 0; i < length; i++) {
     let removed = words_json.shift()
@@ -519,7 +520,7 @@ function generateLayouts(words_json) {
     words_json = shuffle(words_json)
     //removed = words_json.splice((Math.floor(length/2)), 1)
     let new_words = JSON.parse(JSON.stringify(words_json)) //Deep Copy
-    console.log(new_words)
+    // console.log(new_words)
     // console.log("new_words", new_words)
     // console.log("words_json", words_json)
     //console.log("count", count)
