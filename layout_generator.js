@@ -545,6 +545,56 @@ function generateLayouts(words_json) {
   //return layout array
 }
 
+function sort2dByFirstElement(a, b) {
+    if (a[0] === b[0]) {
+        return 0;
+    }
+    else {
+        return (a[0] < b[0]) ? -1 : 1;
+    }
+}
+
+function get_clue_html(output_json) {
+  let clues_across = []
+  let clues_down = []
+  for (let i = 0; i < output_json.length; i++) {
+    // let starts = []
+    // console.log(i)
+    let item = output_json[i]
+    // console.log(item)
+    // starts.push(item.startx)
+    // starts.push(item.starty)
+    // starts.push(item.position)
+    // start_positions.push(starts)
+    if (item.orientation == "across") {
+      if (item.clue) {
+        let clues = [item.position, item.clue]
+        clues_across.push(clues)
+      }
+    }
+    else if (item.orientation == "down") {
+      if (item.clue) {  
+        let clues = [item.position, item.clue]
+        clues_down.push(clues)
+      }
+    }
+  }
+  clues_across.sort(sort2dByFirstElement);
+  clues_down.sort(sort2dByFirstElement);
+  let hasClue = false
+  let clue_html = `<h1>Clues</h1><b>Across</b><br>`
+  for (let i = 0; i < clues_across.length; i++) {
+    hasClue = true
+    clue_html += `<br>${clues_across[i][0]}. ${clues_across[i][1]}`
+  }
+  clue_html += `<br><br><b>Down</b><br>`
+  for (let i = 0; i < clues_down.length; i++) {
+    hasClue = true
+    clue_html += `<br>${clues_down[i][0]}. ${clues_down[i][1]}`
+  }
+  return hasClue ? clue_html : ""
+}
+
 // Function to generate HTML for the crossword grid
 function generateCrosswordHTML(input, output_json, num = "1", header=true, only_answer=false) {
   /*
@@ -697,14 +747,8 @@ function generateCrosswordHTML(input, output_json, num = "1", header=true, only_
   };
 
   crossword += '</div><center>';
-  /*
-  let clues = `<center><h1>Clues</h1><ul>`;
-  //console.log('user_clues', user_clues); 
-  for (let i = 0; i < user_clues.length; i++){
-    clues += `<li>${clueNumbers[i] + user_clues[i]}</li>` 
-  }
-  clues += `</ul>`
-  */
+  
+  let clue_html = get_clue_html(output_json)
 
   let answerKey = ``
   if (only_answer==true) {
@@ -742,8 +786,8 @@ function generateCrosswordHTML(input, output_json, num = "1", header=true, only_
 
   answerKey += '</div><center>';
 
-  clues = "" //UPDATE
-  return [crossword, answerKey, clues];
+  //clues = "" //UPDATE
+  return [crossword, answerKey, clue_html];
 }
 
 // async function createPDF(crossword, answers="") {
