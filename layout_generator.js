@@ -18,7 +18,7 @@ var thesaurus = require("thesaurus")
 // const htmlToPdfmake = require('html-to-pdfmake');
 
 var clueNumbers = {} // key: index in user input, value: clue number 
-
+var checkedSynonyms = true
 // Math functions
 function distance(x1, y1, x2, y2){
   return Math.abs(x1 - x2) + Math.abs(y1 - y2);
@@ -382,8 +382,19 @@ function findWordIntersections(data){
     } 
 
     if(word.orientation != "none" && isIsolated){
-      // add all indices of isolated words to island
-      island.push(wordIndex); 
+      if (checkedSynonyms){
+        // You've already checked to see if synonyms work 
+        // -- don't check again 
+        delete words[wordIndex].startx;
+        delete words[wordIndex].starty;
+        delete words[wordIndex].position;
+        words[wordIndex].orientation = "none";
+        checkedSynonyms = false 
+      }
+      else{
+        // add all indices of isolated words to island
+        island.push(wordIndex); 
+      } 
     }
   }
 
@@ -392,40 +403,44 @@ function findWordIntersections(data){
 
 function removeIsolatedWords(data){
   var island = findWordIntersections(data);
-  var oldTable = data.table;
-  var words = data.result;
-  var rows = oldTable.length;
-  var cols = oldTable[0].length;
-  var newTable = initTable(rows, cols);
-  var synonymUsed = false; 
+  if (!checkedSynonyms){ 
+    var oldTable = data.table;
+    var words = data.result;
+    var rows = oldTable.length;
+    var cols = oldTable[0].length;
+    var newTable = initTable(rows, cols);
+    //var synonymUsed = false; 
 
-  //Find an intersecting synonym for all isolated words: 
-  for (let i = 0; i < island.length; i++){
-    var synonyms = thesaurus.find(words[island[i]].answer)
-    // edit synonyms to remove spaces from entries: 
-    for (let k = 0; k < synonyms.length; k++){
-      synonyms[k] = synonyms[k].split(" ").join(""); 
-    }
-    console.log(synonyms)
-    var max = synonyms.length < 3 ? synonyms.length : 3
-    for (let j = 0; j < max; j++){
-      console.log('synonym: ', synonyms[j]); 
-      words[island[i]].answer = synonyms[j]; 
-      var islandLst = findWordIntersections(data); 
-      if (islandLst.length < island.length){
-        synonymUsed = true; 
-        break; 
+    for (let i = 0; i < island.length; i++){
+      var synonyms = thesaurus.find(words[island[i]].answer)
+      if (synonyms.length == 0){
+        delete words[island[i]].startx
+        delete words[island[i]].starty
+        delete words[island[i]].position
+        words[island[i]].orientation = "none";
+        checkedSynonyms = true // TODO: check this
+      }
+      else{
+        for (let k = 0; k < synonyms.length; k++){
+          synonyms[k] = synonyms[k].split(" ").join(""); 
+        }
+        if (synonyms[0] == words[island[i].answer]){
+          delete words[island[i]].startx
+          delete words[island[i]].starty
+          delete words[island[i]].position
+          words[island[i]].orientation = "none";
+          checkedSynonyms = true // TODO: check this      
+        }
+        else{
+          console.log('synonym: ', synonyms[0])
+          // var max = synonyms.length < 3 ? synonyms.length : 3
+          words[island[i]].answer = synonyms[0]
+          return "redo"
+        }  
       }
     }
-    console.log('synonymUsed: ', synonymUsed); 
-    // if (!synonymUsed){
-    //   delete words[island[i]].startx;
-    //   delete words[island[i]].starty;
-    //   delete words[island[i]].position;
-    //   words[island[i]].orientation = "none";
-    // }
   }
-
+  
   // Draw new table
   newTable = initTable(rows, cols);
   for(let wordIndex in words){
@@ -442,10 +457,10 @@ function removeIsolatedWords(data){
       var j = word.startx - 1;
       for(let k = 0; k < word.answer.length; k++){
         newTable[i + k][j] = word.answer.charAt(k);
+
       }
     }
   }
-
   return {"table": newTable, "result": words};
 }
 
@@ -523,9 +538,27 @@ function generateSimpleTable(words){
   var blankTable = initTable(rows, cols);
   var table = generateTable(blankTable, rows, cols, words, [0.7, 0.15, 0.1, 0.05]);
   var newTable = removeIsolatedWords(table);
-  var finalTable = trimTable(newTable);
-  assignPositions(finalTable.result);
-  return finalTable;
+  if (newTable == "redo"){
+    console.log('redoing dimension calculations, etc.')
+    checkedSynonyms = true 
+    rows = computeDimension(words, 3); 
+    cols = rows; 
+    blankTable = initTable(rows, cols); 
+    table = generateTable(blankTable, rows, cols, words, [0.7, 0.15, 0.1, 0.05]);
+    newTable = removeIsolatedWords(table); 
+    console.log('done removing isolated words again')
+    console.log('new table: ', newTable)
+    finalTable = trimTable(newTable); 
+    console.log('final table: ', finalTable)
+    assignPositions(finalTable.result); 
+    return finalTable; 
+  }
+  else{ 
+    var finalTable = trimTable(newTable);
+    assignPositions(finalTable.result);
+    return finalTable;
+  }
+ 
 }
 
 function generateLayout(words_json){
