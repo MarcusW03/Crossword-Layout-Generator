@@ -18,7 +18,7 @@ var thesaurus = require("thesaurus")
 // const htmlToPdfmake = require('html-to-pdfmake');
 
 var clueNumbers = {} // key: index in user input, value: clue number 
-var checkedSynonyms = true
+var checkedSynonyms = false
 // Math functions
 function distance(x1, y1, x2, y2){
   return Math.abs(x1 - x2) + Math.abs(y1 - y2);
@@ -389,7 +389,7 @@ function findWordIntersections(data){
         delete words[wordIndex].starty;
         delete words[wordIndex].position;
         words[wordIndex].orientation = "none";
-        checkedSynonyms = false 
+        //checkedSynonyms = false 
       }
       else{
         // add all indices of isolated words to island
@@ -403,22 +403,22 @@ function findWordIntersections(data){
 
 function removeIsolatedWords(data){
   var island = findWordIntersections(data);
+  var oldTable = data.table;
+  var words = data.result;
+  //console.log('words in RIW: ', words)
+  var rows = oldTable.length;
+  var cols = oldTable[0].length;
+  var newTable = initTable(rows, cols);
   if (!checkedSynonyms){ 
-    var oldTable = data.table;
-    var words = data.result;
-    var rows = oldTable.length;
-    var cols = oldTable[0].length;
-    var newTable = initTable(rows, cols);
-    //var synonymUsed = false; 
-
     for (let i = 0; i < island.length; i++){
       var synonyms = thesaurus.find(words[island[i]].answer)
+      console.log('synonyms: ', synonyms)
       if (synonyms.length == 0){
         delete words[island[i]].startx
         delete words[island[i]].starty
         delete words[island[i]].position
         words[island[i]].orientation = "none";
-        checkedSynonyms = true // TODO: check this
+        checkedSynonyms = true 
       }
       else{
         for (let k = 0; k < synonyms.length; k++){
@@ -429,12 +429,12 @@ function removeIsolatedWords(data){
           delete words[island[i]].starty
           delete words[island[i]].position
           words[island[i]].orientation = "none";
-          checkedSynonyms = true // TODO: check this      
+          checkedSynonyms = true  
         }
         else{
-          console.log('synonym: ', synonyms[0])
-          // var max = synonyms.length < 3 ? synonyms.length : 3
+          //console.log('synonym: ', synonyms[0])
           words[island[i]].answer = synonyms[0]
+          checkedSynonym = true
           return "redo"
         }  
       }
@@ -461,6 +461,8 @@ function removeIsolatedWords(data){
       }
     }
   }
+  console.log('newTable: ', newTable)
+
   return {"table": newTable, "result": words};
 }
 
@@ -535,29 +537,28 @@ function tableToString(table, delim){
 function generateSimpleTable(words){
   var rows = computeDimension(words, 3);
   var cols = rows;
+  
   var blankTable = initTable(rows, cols);
   var table = generateTable(blankTable, rows, cols, words, [0.7, 0.15, 0.1, 0.05]);
   var newTable = removeIsolatedWords(table);
-  if (newTable == "redo"){
-    console.log('redoing dimension calculations, etc.')
+  //console.log('new table b4 loop: ', newTable)
+  while (newTable == "redo"){
     checkedSynonyms = true 
     rows = computeDimension(words, 3); 
+    //console.log('rows' , rows)
     cols = rows; 
     blankTable = initTable(rows, cols); 
     table = generateTable(blankTable, rows, cols, words, [0.7, 0.15, 0.1, 0.05]);
+    //console.log('table' , table)
     newTable = removeIsolatedWords(table); 
-    console.log('done removing isolated words again')
-    console.log('new table: ', newTable)
-    finalTable = trimTable(newTable); 
-    console.log('final table: ', finalTable)
-    assignPositions(finalTable.result); 
-    return finalTable; 
+    //console.log('new table in loop: ', newTable)
   }
-  else{ 
-    var finalTable = trimTable(newTable);
-    assignPositions(finalTable.result);
-    return finalTable;
-  }
+  
+  var finalTable = trimTable(newTable);
+  //console.log('final: ', finalTable)
+  assignPositions(finalTable.result);
+  return finalTable;
+
  
 }
 
@@ -591,7 +592,7 @@ function generateLayouts(words_json) {
     //console.log("words_json removed", first)
     //let count = words_json.push(first)
     words_json = shuffle(words_json)
-    console.log('words_json ', words_json); 
+    //console.log('words_json ', words_json); 
     //removed = words_json.splice((Math.floor(length/2)), 1)
     let new_words = JSON.parse(JSON.stringify(words_json)) //Deep Copy
     console.log(new_words)
