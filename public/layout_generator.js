@@ -4,7 +4,7 @@
  * MIT License
  */
 
-//var thesaurus = require('powerthesaurus-api')
+//var thesaurus = require('powerthesaurus-api'); 
 //var jsPDF = require('jspdf')
 
 var clueNumbers = {} // key: index in user input, value: clue number 
@@ -309,12 +309,13 @@ function generateTable(table, rows, cols, words, weights){
   return {"table": table, "result": words};
 }
 
-function removeIsolatedWords(data){
+function findWordIntersections(data){
   var oldTable = data.table;
   var words = data.result;
   var rows = oldTable.length;
   var cols = oldTable[0].length;
   var newTable = initTable(rows, cols);
+  var island = []
 
   // Draw intersections as "X"'s
   for(let wordIndex in words){
@@ -368,15 +369,51 @@ function removeIsolatedWords(data){
           break;
         }
       }
-    }
+    } 
+
     if(word.orientation != "none" && isIsolated){
-      delete words[wordIndex].startx;
-      delete words[wordIndex].starty;
-      delete words[wordIndex].position;
-      words[wordIndex].orientation = "none";
+      // add all indices of isolated words to island
+      island.push(wordIndex); 
     }
   }
 
+  return island; 
+  
+}
+
+function removeIsolatedWords(data){
+    var island = findWordIntersections(data);
+    var oldTable = data.table;
+    var words = data.result;
+    //let new_words = JSON.parse(JSON.stringify(words)) 
+    var rows = oldTable.length;
+    var cols = oldTable[0].length;
+    var newTable = initTable(rows, cols);
+    //let synonyms = ['boys', 'males']; 
+    var synonymUsed = false; 
+
+    //Find an intersecting synonym for all isolated words: 
+    for (let i = 0; i < island.length; i++){
+      console.log('island: ', words[island[i]]); 
+      for (let j = 0; j < synonyms.length; j++){
+        console.log('synonym: ', synonyms[j]); 
+        words[island[i]].answer = synonyms[j]; 
+        var islandLst = findWordIntersections(data); 
+        if (islandLst.length < island.length){
+          synonymUsed = true; 
+          break; 
+        }
+      }
+      console.log('synonymUsed: ', synonymUsed); 
+      if (!synonymUsed){
+        delete words[island[i]].startx;
+        delete words[island[i]].starty;
+        delete words[island[i]].position;
+        words[island[i]].orientation = "none";
+      }
+    }
+
+  
   // Draw new table
   newTable = initTable(rows, cols);
   for(let wordIndex in words){
@@ -469,6 +506,7 @@ function tableToString(table, delim){
 }
 
 function generateSimpleTable(words){
+  //console.log("words in gST: ", words); 
   var rows = computeDimension(words, 3);
   var cols = rows;
   var blankTable = initTable(rows, cols);
@@ -758,4 +796,3 @@ function createPDF(crossword, answers="") {
 if(typeof module !== 'undefined'){
   module.exports = { generateLayout, generateCrosswordHTML, createPDF };
 }
-
