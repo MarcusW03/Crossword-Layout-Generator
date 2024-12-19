@@ -9,11 +9,21 @@ To use our repo, you can follow these steps.
 - install our dependencies
   - npm install body-parser
   - npm install express
-  - npm install thesaurus
+  - npm install thesaurus: ```npm i powerthesaurus-api```
 - run the server
   - node index.js
 
 Then, you'll be able to access the Crossword Layout Generator in your broswer at localhost:5001/home. 
+
+## Additional Features (Forked Version) 
+
+- Users can download layouts in PDF format
+- Multiple layouts offered
+- Beautified clue list (in HTML and PDF outputs)
+- Offer synonyms for isolated words instead of removing
+
+## Synonym Feature Demos
+
 
 ## Introduction
 A crossword consists of clues, answers, and a layout:
