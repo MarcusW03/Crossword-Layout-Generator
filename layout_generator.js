@@ -385,11 +385,11 @@ function findWordIntersections(data){
       if (checkedSynonyms){
         // You've already checked to see if synonyms work 
         // -- don't check again 
+        console.log("DELETING HERE, ISLAND, GLOBAL OFF: ", word.answer)
         delete words[wordIndex].startx;
         delete words[wordIndex].starty;
         delete words[wordIndex].position;
         words[wordIndex].orientation = "none";
-        //checkedSynonyms = false 
       }
       else{
         // add all indices of isolated words to island
@@ -403,6 +403,7 @@ function findWordIntersections(data){
 
 function removeIsolatedWords(data){
   var island = findWordIntersections(data);
+  //console.log("island: ", island)
   var oldTable = data.table;
   var words = data.result;
   //console.log('words in RIW: ', words)
@@ -412,31 +413,25 @@ function removeIsolatedWords(data){
   if (!checkedSynonyms){ 
     for (let i = 0; i < island.length; i++){
       var synonyms = thesaurus.find(words[island[i]].answer)
-      console.log('synonyms: ', synonyms)
       if (synonyms.length == 0){
+        console.log("DELETING HERE, SYNONYMS = 0: ", words[island[i]].answer)
         delete words[island[i]].startx
         delete words[island[i]].starty
         delete words[island[i]].position
         words[island[i]].orientation = "none";
-        checkedSynonyms = true 
       }
       else{
         for (let k = 0; k < synonyms.length; k++){
           synonyms[k] = synonyms[k].split(" ").join(""); 
+          if (synonyms[k] == words[island[i]].answer){
+            synonyms.splice(k, 1)
+          }
         }
-        if (synonyms[0] == words[island[i].answer]){
-          delete words[island[i]].startx
-          delete words[island[i]].starty
-          delete words[island[i]].position
-          words[island[i]].orientation = "none";
-          checkedSynonyms = true  
-        }
-        else{
-          //console.log('synonym: ', synonyms[0])
-          words[island[i]].answer = synonyms[0]
-          checkedSynonym = true
-          return "redo"
-        }  
+        //console.log('synonym: ', synonyms[0])
+        words[island[i]].answer = synonyms[0]
+        checkedSynonyms = true
+        return "redo"
+      
       }
     }
   }
@@ -461,7 +456,7 @@ function removeIsolatedWords(data){
       }
     }
   }
-  console.log('newTable: ', newTable)
+  //console.log('newTable: ', newTable)
 
   return {"table": newTable, "result": words};
 }
@@ -543,7 +538,7 @@ function generateSimpleTable(words){
   var newTable = removeIsolatedWords(table);
   //console.log('new table b4 loop: ', newTable)
   while (newTable == "redo"){
-    checkedSynonyms = true 
+    //console.log("words in redo: ", words)
     rows = computeDimension(words, 3); 
     //console.log('rows' , rows)
     cols = rows; 
