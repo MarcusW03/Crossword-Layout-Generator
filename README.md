@@ -24,7 +24,11 @@ Then, you'll be able to access the Crossword Layout Generator in your broswer at
 
 ## Synonym Feature Demos
 
+- Demo 1: 
+![Demonstration One](https://raw.githubusercontent.com/MarcusW03/Crossword-Layout-Generator/master/example_images/CrosswordSynonymFeature.png)
 
+- Demo 2:
+  
 ## Introduction
 A crossword consists of clues, answers, and a layout:
 - The answers are the hidden words that the player is trying to guess.
