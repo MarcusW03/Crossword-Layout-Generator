@@ -24,10 +24,9 @@ Then, you'll be able to access the Crossword Layout Generator in your broswer at
 
 ## Synonym Feature Demos
 
-- Demo 1: 
-![Demonstration One](https://raw.githubusercontent.com/MarcusW03/Crossword-Layout-Generator/master/example_images/CrosswordSynonymFeature.png)
+- ![Demo 1](https://github.com/user-attachments/assets/94c48914-ab57-471f-b9bb-2cb192a2b549)
 
-- Demo 2:
+- ![Demo 2](https://github.com/user-attachments/assets/e3328612-5922-4c59-8623-311ec6226ea7)
   
 ## Introduction
 A crossword consists of clues, answers, and a layout:
